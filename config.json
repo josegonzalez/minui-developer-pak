@@ -1,0 +1,5 @@
+{
+    "label": "Developer",
+    "launch": "launch.sh",
+    "description": "Keeps the screen awake for development purposes"
+}

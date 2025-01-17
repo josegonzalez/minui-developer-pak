@@ -1,0 +1,4 @@
+bin/evtest
+bin/sdl2imgshow
+bin/sleep-daemon
+res/fonts/BPreplayBold.otf

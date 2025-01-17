@@ -1,0 +1,19 @@
+FROM golang:1.23.4-bullseye
+
+COPY sleep-daemon /go/src/github.com/josegonzalez/sleep-daemon
+
+WORKDIR /go/src/github.com/josegonzalez/sleep-daemon
+
+ENV GOOS=linux
+ENV GOARCH=arm64
+ENV CGO_ENABLED=1
+ENV CC=aarch64-linux-gnu-gcc
+
+RUN go build -tags nogcs,nos3 \
+    -ldflags "-linkmode external -extldflags '--static-pie' -s -w" \
+    -buildmode=pie \
+    -o sleep-daemon
+
+RUN apt-get update && apt-get install -y file
+
+RUN file /go/src/github.com/josegonzalez/sleep-daemon/sleep-daemon
