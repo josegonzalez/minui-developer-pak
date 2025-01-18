@@ -8,7 +8,7 @@ trap "rm -f /tmp/stay_awake" EXIT INT TERM HUP QUIT
 BUTTON_LOG="$progdir/log/buttons.log"
 
 SERVICE_NAME="sleep-daemon"
-HUMAN_READABLE_NAME="Sleep Daemon"
+HUMAN_READABLE_NAME="Developer Sleep Daemon"
 SUPPORTS_DAEMON_MODE=1
 service_on() {
     cd /mnt/SDCARD/ || exit
