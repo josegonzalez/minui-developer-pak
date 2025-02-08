@@ -2,5 +2,7 @@
 .gitattributes export-ignore
 .gitarchiveinclude export-ignore
 .gitignore export-ignore
+sleep-daemon/main.go export-ignore
+sleep-daemon/go.mod export-ignore
 Dockerfile.sdl2imgshow export-ignore
 Makefile export-ignore
