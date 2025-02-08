@@ -12,10 +12,10 @@ HUMAN_READABLE_NAME="Developer Sleep Daemon"
 ONLY_LAUNCH_THEN_EXIT=0
 LAUNCHES_SCRIPT="false"
 service_on() {
-    cd "$SDCARD_PATH" || exit 1
+    cd "$SDCARD_PATH" || return 1
 
     chmod +x "$progdir/bin/sleep-daemon"
-    "$progdir/bin/sleep-daemon" >"$LOGS_PATH/$PAK_NAME.txt" 2>&1 &
+    "$progdir/bin/sleep-daemon" >"$LOGS_PATH/$PAK_NAME.service.txt" 2>&1 &
 }
 
 service_off() {
@@ -139,12 +139,12 @@ main() {
     allowed_platforms="tg5040 rg35xxplus"
     if ! echo "$allowed_platforms" | grep -q "$PLATFORM"; then
         show_message "$PLATFORM is not a supported platform" 2
-        exit 1
+        return 1
     fi
 
     if [ ! -f "$progdir/bin/minui-btntest-$PLATFORM" ]; then
         show_message "$progdir/bin/minui-btntest-$PLATFORM not found" 2
-        exit 1
+        return 1
     fi
 
     chmod +x "$progdir/bin/minui-btntest-$PLATFORM"
