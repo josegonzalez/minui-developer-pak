@@ -4,8 +4,6 @@ progdir="$(dirname "$0")"
 cd "$progdir" || exit 1
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$progdir/lib"
 echo 1 >/tmp/stay_awake
-trap "rm -f /tmp/stay_awake" EXIT INT TERM HUP QUIT
-BUTTON_LOG="$progdir/log/buttons.log"
 
 SERVICE_NAME="sleep-daemon"
 HUMAN_READABLE_NAME="Developer Sleep Daemon"
@@ -33,7 +31,7 @@ show_message() {
         seconds="forever"
     fi
 
-    killall sdl2imgshow
+    killall sdl2imgshow >/dev/null 2>&1 || true
     echo "$message"
     if [ "$seconds" = "forever" ]; then
         "$progdir/bin/sdl2imgshow" \
@@ -42,7 +40,7 @@ show_message() {
             -s 27 \
             -c "220,220,220" \
             -q \
-            -t "$message" &
+            -t "$message" >/dev/null 2>&1 &
     else
         "$progdir/bin/sdl2imgshow" \
             -i "$progdir/res/background.png" \
@@ -50,74 +48,9 @@ show_message() {
             -s 27 \
             -c "220,220,220" \
             -q \
-            -t "$message"
+            -t "$message" >/dev/null 2>&1
         sleep "$seconds"
     fi
-}
-
-monitor_buttons() {
-    if [ -f "$BUTTON_LOG" ]; then
-        mv "$BUTTON_LOG" "$BUTTON_LOG.old"
-    fi
-    touch "$BUTTON_LOG"
-
-    chmod +x "$progdir/bin/evtest"
-    for dev in /dev/input/event*; do
-        [ -e "$dev" ] || continue
-        "$progdir/bin/evtest" "$dev" 2>&1 | while read -r line; do
-            if echo "$line" | grep -q "code 17 (ABS_HAT0Y).*value -1"; then
-                echo "D_PAD_UP detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 17 (ABS_HAT0Y).*value 1"; then
-                echo "D_PAD_DOWN detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 16 (ABS_HAT0X).*value 1"; then
-                echo "D_PAD_RIGHT detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 16 (ABS_HAT0X).*value -1"; then
-                echo "D_PAD_LEFT detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 308 (BTN_WEST).*value 1"; then
-                echo "BUTTON_X detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 305 (BTN_EAST).*value 1"; then
-                echo "BUTTON_A detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 304 (BTN_SOUTH).*value 1"; then
-                echo "BUTTON_B detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 307 (BTN_NORTH).*value 1"; then
-                echo "BUTTON_Y detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 317 (BTN_THUMBL).*value 1"; then
-                echo "HOTKEY_1 detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 318 (BTN_THUMBR).*value 1"; then
-                echo "HOTKEY_2 detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 310 (BTN_TL).*value 1"; then
-                echo "L1 detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 311 (BTN_TR).*value 1"; then
-                echo "R1 detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 2 (ABS_Z).*value 255"; then
-                echo "L2 detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 5 (ABS_RZ).*value 255"; then
-                echo "R2 detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 316 (BTN_MODE).*value 1"; then
-                echo "MENU detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 314 (BTN_SELECT).*value 1"; then
-                echo "SELECT detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 315 (BTN_START).*value 1"; then
-                echo "START detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 115 (KEY_VOLUMEUP).*value 1"; then
-                echo "VOLUME_UP detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 114 (KEY_VOLUMEDOWN).*value 1"; then
-                echo "VOLUME_DOWN detected" >>"$BUTTON_LOG"
-            elif echo "$line" | grep -q "code 116 (KEY_POWER).*value 1"; then
-                echo "POWER detected" >>"$BUTTON_LOG"
-            fi
-        done &
-    done
-}
-
-wait_for_button() {
-    button="$1"
-    while true; do
-        if grep -q "$button" "$BUTTON_LOG"; then
-            break
-        fi
-        sleep 0.1
-    done
 }
 
 is_service_running() {
@@ -182,18 +115,42 @@ main_process() {
     fi
 
     show_message "Press B to exit"
-    monitor_buttons
 
-    wait_for_button "BUTTON_B"
+    "$progdir/bin/minui-btntest-$PLATFORM" wait just_pressed all btn_b
     show_message "Stopping $HUMAN_READABLE_NAME"
     service_off
-    killall evtest
     sync
     sleep 1
     show_message "Done" 1
 }
 
+cleanup() {
+    rm -f /tmp/stay_awake
+    killall sdl2imgshow >/dev/null 2>&1 || true
+}
+
 main() {
+    trap "cleanup" EXIT INT TERM HUP QUIT
+
+    if [ "$PLATFORM" = "tg3040" ] && [ -z "$DEVICE" ]; then
+        export DEVICE="brick"
+        export PLATFORM="tg5040"
+    fi
+
+    allowed_platforms="tg5040 rg35xxplus"
+    if ! echo "$allowed_platforms" | grep -q "$PLATFORM"; then
+        show_message "$PLATFORM is not a supported platform" 2
+        exit 1
+    fi
+
+    if [ ! -f "$progdir/bin/minui-btntest-$PLATFORM" ]; then
+        show_message "$progdir/bin/minui-btntest-$PLATFORM not found" 2
+        exit 1
+    fi
+
+    chmod +x "$progdir/bin/minui-btntest-$PLATFORM"
+    chmod +x "$progdir/bin/sdl2imgshow"
+
     if [ "$ONLY_LAUNCH_THEN_EXIT" -eq 1 ]; then
         service_on
         return $?
@@ -204,7 +161,7 @@ main() {
     else
         main_process
     fi
-    killall sdl2imgshow
+    killall sdl2imgshow >/dev/null 2>&1 || true
 }
 
 mkdir -p "$progdir/log"

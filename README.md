@@ -1,28 +1,24 @@
-# trimui-brick-developer.pak
+# minui-developer.pak
 
-A TrimUI Brick app that keeps the screen awake for development purposes.
+A MinUI app that keeps the screen awake for development purposes.
 
 ## Requirements
 
-- Docker (for building)
+This pak is designed and tested on the following MinUI Platforms and devices:
 
-## Building
+- `tg5040`: Trimui Brick (formerly `tg3040`), Trimui Smart Pro
+- `rg35xxplus`: RG-35XX Plus, RG-34XX, RG-35XX H, RG-35XX SP
 
-```shell
-make release
-```
+Use the correct platform for your device.
 
 ## Installation
 
-1. Mount your TrimUI Brick SD card.
+1. Mount your MinUI SD card.
 2. Download the latest release from Github. It will be named `Developer.pak.zip`.
-3. Copy the zip file to `/Tools/tg5040/Developer.pak.zip`.
+3. Copy the zip file to `/Tools/$PLATFORM/Developer.pak.zip`.
 4. Extract the zip in place, then delete the zip file.
-5. Confirm that there is a `/Tools/tg5040/Developer.pak/launch.sh` file on your SD card.
-6. Unmount your SD Card and insert it into your TrimUI Brick.
-
-> [!NOTE]
-> The device directory changed from `/Tools/tg3040` to `/Tools/tg5040` in `MinUI-20250126-0` - released 2025-01-26. If you are using an older version of MinUI, use `/Tools/tg3040` instead.
+5. Confirm that there is a `/Tools/$PLATFORM/Developer.pak/launch.sh` file on your SD card.
+6. Unmount your SD Card and insert it into your MinUI device.
 
 ## Usage
 
