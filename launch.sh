@@ -2,6 +2,8 @@
 echo "$0" "$@"
 progdir="$(dirname "$0")"
 cd "$progdir" || exit 1
+[ -f "$progdir/debug" ] && set -x
+PAK_NAME="$(basename "$progdir")"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$progdir/lib"
 echo 1 >/tmp/stay_awake
 
@@ -11,12 +13,9 @@ ONLY_LAUNCH_THEN_EXIT=0
 LAUNCHES_SCRIPT="false"
 service_on() {
     cd "$SDCARD_PATH" || exit 1
-    if [ -f "$progdir/log/service.log" ]; then
-        mv "$progdir/log/service.log" "$progdir/log/service.log.old"
-    fi
 
     chmod +x "$progdir/bin/sleep-daemon"
-    "$progdir/bin/sleep-daemon" >"$progdir/log/service.log" 2>&1 &
+    "$progdir/bin/sleep-daemon" >"$LOGS_PATH/$PAK_NAME.txt" 2>&1 &
 }
 
 service_off() {
@@ -164,9 +163,4 @@ main() {
     killall sdl2imgshow >/dev/null 2>&1 || true
 }
 
-mkdir -p "$progdir/log"
-if [ -f "$progdir/log/launch.log" ]; then
-    mv "$progdir/log/launch.log" "$progdir/log/launch.log.old"
-fi
-
-main "$@" >"$progdir/log/launch.log" 2>&1
+main "$@" >"$LOGS_PATH/$PAK_NAME.txt" 2>&1
