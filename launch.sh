@@ -10,6 +10,7 @@ exec 2>&1
 
 echo "$0" "$@"
 cd "$PAK_DIR" || exit 1
+mkdir -p "$USERDATA_PATH/$PAK_NAME"
 
 export PATH="$PAK_DIR/bin/$PLATFORM:$PATH"
 
