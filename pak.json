@@ -1,14 +1,14 @@
 {
-    "name": "Developer",
-    "type": "TOOL",
-    "description": "Keeps the screen awake for development purposes",
-    "author": "josegonzalez",
-    "repo_url": "https://github.com/josegonzalez/minui-developer-pak",
-    "release_filename": "Developer.pak.zip",
-    "platforms": [
-        "rg35xxplus",
-        "tg5040"
-    ],
-    "launch": "launch.sh",
-    "version": "latest"
+  "name": "Developer",
+  "type": "TOOL",
+  "description": "Keeps the screen awake for development purposes",
+  "author": "josegonzalez",
+  "repo_url": "https://github.com/josegonzalez/minui-developer-pak",
+  "release_filename": "Developer.pak.zip",
+  "platforms": [
+    "rg35xxplus",
+    "tg5040"
+  ],
+  "launch": "launch.sh",
+  "version": "0.6.2"
 }
