@@ -28,6 +28,12 @@ main() {
         export PLATFORM="tg5040"
     fi
 
+    allowed_platforms="miyoomini my282 my355 tg5040 rg35xxplus"
+    if ! echo "$allowed_platforms" | grep -q "$PLATFORM"; then
+        show_message "$PLATFORM is not a supported platform" 2
+        return 1
+    fi
+
     if ! command -v minui-presenter >/dev/null 2>&1; then
         echo "minui-presenter not found" >&2
         return 1
