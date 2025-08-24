@@ -6,6 +6,8 @@
   "repo_url": "https://github.com/josegonzalez/minui-developer-pak",
   "release_filename": "Developer.pak.zip",
   "platforms": [
+    "miyoomini",
+    "my282",
     "my355",
     "rg35xxplus",
     "tg5040"
