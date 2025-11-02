@@ -8,7 +8,7 @@ PUSH_PLATFORM ?= tg5040
 ARCHITECTURES := arm arm64
 PLATFORMS := miyoomini my282 my355 rg35xxplus tg5040
 
-MINUI_PRESENTER_VERSION := 0.7.0
+MINUI_PRESENTER_VERSION := 0.10.0
 
 clean:
 	rm -f bin/*/minui-presenter || true
