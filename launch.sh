@@ -14,6 +14,10 @@ mkdir -p "$USERDATA_PATH/$PAK_NAME"
 
 export PATH="$PAK_DIR/bin/$PLATFORM:$PATH"
 
+if [ "$DEVICE" = "rgsp" ]; then
+    export RGXX_MODEL="RG34xx"
+fi
+
 show_message() {
     message="$1"
     seconds="$2"
@@ -45,7 +49,7 @@ main() {
         export PLATFORM="tg5040"
     fi
 
-    allowed_platforms="miyoomini my282 my355 tg5040 tg5050 rg35xxplus"
+    allowed_platforms="h700 miyoomini my282 my355 rg35xxplus tg5040 tg5050"
     if ! echo "$allowed_platforms" | grep -q "$PLATFORM"; then
         show_message "$PLATFORM is not a supported platform" 2
         return 1
